@@ -403,6 +403,12 @@ bot.action(/buy_(\d+)_(btc|ltc|usdt)/, async (ctx) => {
             .replace('%s', currency.toUpperCase())
             .replace('%s', `\`${paymentAddress}\``);
 
+
+
+
+
+
+
         await ctx.editMessageText(paymentMessage, {
             reply_markup: {
                 inline_keyboard: [
