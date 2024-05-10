@@ -137,7 +137,7 @@ const languages = {
         selectProduct: "Choose the product you want to purchase.",
         selectQuantity: "Choose the desired quantity.",
         paymentDetails: "Product - %s\nQuantity - %s\nPrice - $%s\n\nTo pay, choose one of the three cryptocurrencies!\nYou have 10 minutes to complete the payment, after which the request will be automatically canceled.",
-        paymentRequest: "Payment request.\nProduct - %s\nQuantity - %s\nPrice - $%s\n\nAmount to be paid: %s %s\n\nWallet address: %s\n\n⚡️You must transfer the exact amount to the specified wallet address, otherwise the request will be rejected. The request will be automatically confirmed after the funds are received!",
+        paymentRequest: "Payment request.\nProduct - %s\nQuantity - %s\nPrice - $%s\n\nAmount to be paid: `%s %s`\n\nWallet address: `%s`\n\n⚡️You must transfer the exact amount to the specified wallet address, otherwise the request will be rejected. The request will be automatically confirmed after the funds are received!",
         paymentTimeout: "⚠️The payment waiting time has expired. If you continue to create payment requests without paying, you will be permanently banned!",
         attentionOutOfPhotos: "Attention, photos ran out for the product - %s\nAdd photos.",
         photoAddedSuccessfully: "Photos successfully added 👌🏿\nCount - %d\nCategory - %s",
@@ -175,7 +175,7 @@ const languages = {
         selectProduct: "Выберите товар, который хотите приобрести.",
         selectQuantity: "Выберите нужное количество.",
         paymentDetails: "Название товара - %s\nКоличество - %s\nЦена - $%s\n\nДля оплаты выберите одну из трёх криптовалют!\nУ вас будет 10 минут для оплаты заказа, после чего заявка будет автоматически отменена.",
-        paymentRequest: "Заявка на оплату.\nНазвание товара - %s\nКоличество - %s\nЦена - $%s\n\nСумма к оплате: %s %s\n\nАдрес кошелька: %s\n\n⚡️Необходимо перевести точную сумму на указанный адрес кошелька, в противном случае заявка будет отклонена. Заявка будет подтверждена автоматически после поступления средств!",
+        paymentRequest: "Заявка на оплату.\nНазвание товара - %s\nКоличество - %s\nЦена - $%s\n\nСумма к оплате: `%s %s`\n\nАдрес кошелька: `%s`\n\n⚡️Необходимо перевести точную сумму на указанный адрес кошелька, в противном случае заявка будет отклонена. Заявка будет подтверждена автоматически после поступления средств!",
         paymentTimeout: "❗️Время ожидания оплаты истекло. В случае, если вы будете создавать заявки на оплату, не оплачивая их, мы заблокируем вас навсегда!",
         attentionOutOfPhotos: "Внимание, закончились фото для товара - %s\nДобавьте фото.",
         photoAddedSuccessfully: "Фото успешно добавлены 👌🏿\nКоличество - %d\nКатегория товара - %s",
@@ -396,21 +396,22 @@ bot.action(/buy_(\d+)_(btc|ltc|usdt)/, async (ctx) => {
         }
 
         const paymentMessage = msgs.paymentRequest
-            .replace('%s', variation.name)
-            .replace('%s', variation.variation)
-            .replace('%s', variation.price) // Отображаем пользователю цену без комиссии
-            .replace('%s', `\`${priceInCrypto}\``)
-            .replace('%s', currency.toUpperCase())
-            .replace('%s', `\`${paymentAddress}\``);
+    .replace('%s', variation.name)
+    .replace('%s', variation.variation)
+    .replace('%s', variation.price) // Отображаем пользователю цену без комиссии
+    .replace('%s', `${priceInCrypto}`) // Моноширный текст для суммы
+    .replace('%s', currency.toUpperCase())
+    .replace('%s', `${paymentAddress}`); // Моноширный текст для адреса кошелька
 
-        await ctx.editMessageText(paymentMessage, {
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: `Я оплатил - ${variation.variation}`, callback_data: `paid_${variation.id}_${ctx.from.id}_${currency}_${paymentAddress}` }],
-                    [{ text: msgs.backToMenu, callback_data: `select_quantity_${variation.id}_${variation.variation}` }]
-                ]
-            }
-        });
+await ctx.editMessageText(paymentMessage, {
+    reply_markup: {
+        inline_keyboard: [
+            [{ text: `Я оплатил - ${variation.variation}`, callback_data: `paid_${variation.id}_${ctx.from.id}_${currency}` }],
+            [{ text: msgs.backToMenu, callback_data: `back_to_shop_${variation.product_id}` }]
+        ]
+    }
+});
+
 
     });
 });
